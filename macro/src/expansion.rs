@@ -251,10 +251,10 @@ pub fn expand_grammar(input: ItemMod) -> ItemMod {
         .find_map(|item| match item {
             Item::Enum(ItemEnum { ident, attrs, .. })
             | Item::Struct(ItemStruct { ident, attrs, .. }) => {
-                if attrs
-                    .iter()
-                    .any(|attr| attr.path == syn::parse_quote!(rust_sitter::language))
-                {
+                if attrs.iter().any(|attr| {
+                    attr.path == syn::parse_quote!(rust_sitter::language)
+                        || attr.path == syn::parse_quote!(language)
+                }) {
                     Some(ident.clone())
                 } else {
                     None
@@ -262,7 +262,7 @@ pub fn expand_grammar(input: ItemMod) -> ItemMod {
             }
             _ => None,
         })
-        .expect("Each parser must have the root type annotated with `#[rust_sitter::language]`");
+        .expect("Each parser must have the root type annotated with `#[rust_sitter::language] or #[language]`");
 
     let mut transformed: Vec<Item> = new_contents
         .iter()
